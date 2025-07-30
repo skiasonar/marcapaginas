@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Marcapáginas Clásico</title>
+    <style>
+        body { font-family: 'Noto Serif', serif; text-align: center; background-color: #f4f4f4; }
+        #bookmark { width: 200px; height: 600px; margin: 20px auto; border: 1px solid #ccc;
+            background-size: cover; position: relative; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: black; padding: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        .text-block { white-space: pre-wrap; text-align: center; }
+        select, textarea, button { margin: 10px; padding: 5px; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <h1>Elabora tu marcapáginas</h1>
+
+    <label for="quoteSelect">Elige una frase clásica:</label><br>
+    <select id="quoteSelect" onchange="updateQuote()">
+        <option value="">-- Selecciona una frase --</option>
+        <option value="1">1 – Eurípides</option>
+        <option value="2">2 – Gorgias</option>
+        <option value="3">3 – Pericles</option>
+        <option value="4">4 – Epicteto</option>
+        <option value="5">5 – Safo</option>
+        <option value="6">6 – Homero</option>
+    </select><br>
+
+    <label for="customText">... o escribe tu propia frase (griego o alfabeto latino):</label><br>
+    <textarea id="customText" rows="3" cols="30" oninput="updateQuote()"></textarea><br>
+
+    <label for="backgroundSelect">Fondo:</label>
+    <select id="backgroundSelect" onchange="updateBackground()">
+        <option value="marble">Mármol</option>
+        <option value="papyrus">Papiro</option>
+        <option value="wood">Madera</option>
+        <option value="stone">Piedra</option>
+        <option value="parchment">Pergamino</option>
+    </select><br>
+
+    <div id="bookmark">
+        <div id="greek" class="text-block" style="font-size: 16px; font-weight: bold;"></div>
+        <div id="translation" class="text-block" style="font-size: 12px; margin-top: 10px;"></div>
+    </div>
+
+    <button onclick="downloadImage()">Descargar</button>
+
+    <script>
+        const quotes = {
+            1: {
+                greek: "ὡς τρὶς ἂν παρ᾽ ἀσπίδα στῆναι θέλοιμ᾽ ἂν μᾶλλον ἢ τεκεῖν ἅπαξ",
+                translation: "¡Prefiero estar tres veces tras un escudo a parir una sola!"
+            },
+            2: {
+                greek: "λόγος δυνάστης μέγας ἐστίν, ὃς σμικροτάτῳ σώματι καὶ ἀφανεστάτῳ θειότατα ἔργα ἀποτελεῖ",
+                translation: "La palabra es un gran señor que con un cuerpo muy pequeño y discreto realiza acciones propias de un dios."
+            },
+            3: {
+                greek: "φιλοκαλοῦμέν τε γὰρ μετ᾽ εὐτελείας καὶ φιλοσοφοῦμεν ἄνευ μαλακίας",
+                translation: "Amamos la belleza sin derroche y amamos el saber sin debilidad."
+            },
+            4: {
+                greek: "ταράσσει τοὺς ἀνθρώπους οὐ τὰ πράγματα, ἀλλὰ τὰ περὶ τῶν πραγμάτων δόγματα",
+                translation: "Lo que preocupa a los hombres no son los hechos, sino las opiniones sobre los hechos."
+            },
+            5: {
+                greek: "ἀλλὰ πᾶν τόλματον…",
+                translation: "Pero hay que atreverse a todo…"
+            },
+            6: {
+                greek: "Ἄργος, ἐνίπλειος κυνοραιστέων.
+δὴ τότε γ᾽, ὡς ἐνόησεν Ὀδυσσέα ἐγγὺς ἐόντα,
+οὐρῇ μέν ῥ᾽ ὅ γ᾽ ἔσηνε καὶ οὔατα κάββαλεν ἄμφω.",
+                translation: "Allí estaba tendido el can Argos, infestado de pulgas. Justo en ese momento, al sentir a Odiseo cercano, saludando la cola movió y agachó las orejas."
+            }
+        };
+
+        function updateQuote() {
+            const selected = document.getElementById('quoteSelect').value;
+            const custom = document.getElementById('customText').value.trim();
+            if (custom !== "") {
+                document.getElementById('greek').textContent = custom;
+                document.getElementById('translation').textContent = "";
+            } else if (selected && quotes[selected]) {
+                document.getElementById('greek').textContent = quotes[selected].greek;
+                document.getElementById('translation').textContent = quotes[selected].translation;
+            } else {
+                document.getElementById('greek').textContent = "";
+                document.getElementById('translation').textContent = "";
+            }
+        }
+
+        function updateBackground() {
+            const value = document.getElementById('backgroundSelect').value;
+            document.getElementById('bookmark').style.backgroundImage = "url('img/" + value + ".jpg')";
+        }
+
+        function downloadImage() {
+            html2canvas(document.getElementById("bookmark")).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'marcapaginas.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>
