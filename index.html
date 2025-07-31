@@ -1,110 +1,150 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <title>Marcapáginas Clásico</title>
-    <style>
-        body { font-family: 'Noto Serif', serif; text-align: center; background-color: #f4f4f4; }
-        #bookmark { width: 200px; height: 600px; margin: 20px auto; border: 1px solid #ccc;
-            background-size: cover; position: relative; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; color: black; padding: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-        .text-block { white-space: pre-wrap; text-align: center; }
-        select, textarea, button { margin: 10px; padding: 5px; font-size: 1rem; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Generador de Marcapáginas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #preview {
+      position: relative;
+      width: 400px;
+      height: 1000px;
+      border: 1px solid #ccc;
+      margin: 0 auto 20px;
+      background-size: cover;
+      background-position: center;
+      color: #000;
+      font-size: 20px;
+    }
+    .overlay {
+      position: absolute;
+      width: 90%;
+      left: 5%;
+      text-align: center;
+    }
+    #greek {
+      top: 60%;
+      font-family: "Noto Serif", serif;
+      font-size: 22px;
+    }
+    #translation {
+      top: 72%;
+      font-style: italic;
+      font-size: 16px;
+    }
+    #author {
+      top: 85%;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-    <h1>Elabora tu marcapáginas</h1>
+  <h1>Elabora tu marcapáginas</h1>
+  <div id="preview">
+    <div id="greek" class="overlay"></div>
+    <div id="translation" class="overlay"></div>
+    <div id="author" class="overlay"></div>
+  </div>
 
-    <label for="quoteSelect">Elige una frase clásica:</label><br>
-    <select id="quoteSelect" onchange="updateQuote()">
-        <option value="">-- Selecciona una frase --</option>
-        <option value="1">1 – Eurípides</option>
-        <option value="2">2 – Gorgias</option>
-        <option value="3">3 – Pericles</option>
-        <option value="4">4 – Epicteto</option>
-        <option value="5">5 – Safo</option>
-        <option value="6">6 – Homero</option>
-    </select><br>
+  <label>Fondo:
+    <select id="bgSelect">
+      <option value="img/fondo1.jpg">Fondo 1</option>
+      <option value="img/fondo2.jpg">Fondo 2</option>
+    </select>
+  </label>
+  <br><br>
 
-    <label for="customText">... o escribe tu propia frase (griego o alfabeto latino):</label><br>
-    <textarea id="customText" rows="3" cols="30" oninput="updateQuote()"></textarea><br>
+  <label>Frase:
+    <select id="quoteSelect">
+      <option value="0">1. Eurípides</option>
+      <option value="1">2. Gorgias</option>
+      <option value="2">3. Pericles</option>
+      <option value="3">4. Epicteto</option>
+      <option value="4">5. Safo</option>
+      <option value="5">6. Homero</option>
+    </select>
+  </label>
+  <br><br>
 
-    <label for="backgroundSelect">Fondo:</label>
-    <select id="backgroundSelect" onchange="updateBackground()">
-        <option value="marble">Mármol</option>
-        <option value="papyrus">Papiro</option>
-        <option value="wood">Madera</option>
-        <option value="stone">Piedra</option>
-        <option value="parchment">Pergamino</option>
-    </select><br>
+  <label>O escribe la tuya (puedes usar griego y latín):<br>
+    <textarea id="customGreek" rows="2" cols="40" placeholder="Frase (griego o latín)"></textarea><br>
+    <input type="text" id="customTranslation" placeholder="Traducción" size="40">
+  </label>
+  <br><br>
 
-    <div id="bookmark">
-        <div id="greek" class="text-block" style="font-size: 16px; font-weight: bold;"></div>
-        <div id="translation" class="text-block" style="font-size: 12px; margin-top: 10px;"></div>
-    </div>
+  <button onclick="updateBookmark()">Actualizar</button>
+  <button onclick="downloadImage()">Descargar</button>
 
-    <button onclick="downloadImage()">Descargar</button>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    const phrases = [
+      {
+        greek: "ὡς τρὶς ἂν παρ᾽ ἀσπίδα στῆναι θέλοιμ᾽ ἂν μᾶλλον ἢ τεκεῖν ἅπαξ",
+        translation: "¡Prefiero estar tres veces tras un escudo a parir una sola!",
+        author: "Eurípides, Medea 250-251"
+      },
+      {
+        greek: "λόγος δυνάστης μέγας ἐστίν, ὃς σμικροτάτῳ σώματι καὶ ἀφανεστάτῳ θειότατα ἔργα ἀποτελεῖ",
+        translation: "La palabra es un gran señor que con un cuerpo muy pequeño y discreto realiza acciones propias de un dios.",
+        author: "Gorgias, Elogio a Elena § 8"
+      },
+      {
+        greek: "φιλοκαλοῦμέν τε γὰρ μετ᾽ εὐτελείας καὶ φιλοσοφοῦμεν ἄνευ μαλακίας",
+        translation: "Amamos la belleza sin derroche y amamos el saber sin debilidad.",
+        author: "Pericles, Oración fúnebre II, 40"
+      },
+      {
+        greek: "ταράσσει τοὺς ἀνθρώπους οὐ τὰ πράγματα, ἀλλὰ τὰ περὶ τῶν πραγμάτων δόγματα",
+        translation: "Lo que preocupa a los hombres no son los hechos, sino las opiniones sobre los hechos.",
+        author: "Epicteto, Enquiridión, § V"
+      },
+      {
+        greek: "ἀλλὰ πᾶν τόλματον …",
+        translation: "Pero hay que atreverse a todo...",
+        author: "Safo, fragmento 5.2"
+      },
+      {
+        greek: "Ἄργος, ἐνίπλειος κυνοραιστέων... οὐρῇ μέν ῥ᾽ ὅ γ᾽ ἔσηνε καὶ οὔατα κάββαλεν ἄμφω.",
+        translation: "Allí estaba tendido el can Argos... saludando la cola movió y agachó las orejas.",
+        author: "Odisea XVII, 300-302"
+      }
+    ];
 
-    <script>
-        const quotes = {
-            1: {
-                greek: "ὡς τρὶς ἂν παρ᾽ ἀσπίδα στῆναι θέλοιμ᾽ ἂν μᾶλλον ἢ τεκεῖν ἅπαξ",
-                translation: "¡Prefiero estar tres veces tras un escudo a parir una sola!"
-            },
-            2: {
-                greek: "λόγος δυνάστης μέγας ἐστίν, ὃς σμικροτάτῳ σώματι καὶ ἀφανεστάτῳ θειότατα ἔργα ἀποτελεῖ",
-                translation: "La palabra es un gran señor que con un cuerpo muy pequeño y discreto realiza acciones propias de un dios."
-            },
-            3: {
-                greek: "φιλοκαλοῦμέν τε γὰρ μετ᾽ εὐτελείας καὶ φιλοσοφοῦμεν ἄνευ μαλακίας",
-                translation: "Amamos la belleza sin derroche y amamos el saber sin debilidad."
-            },
-            4: {
-                greek: "ταράσσει τοὺς ἀνθρώπους οὐ τὰ πράγματα, ἀλλὰ τὰ περὶ τῶν πραγμάτων δόγματα",
-                translation: "Lo que preocupa a los hombres no son los hechos, sino las opiniones sobre los hechos."
-            },
-            5: {
-                greek: "ἀλλὰ πᾶν τόλματον…",
-                translation: "Pero hay que atreverse a todo…"
-            },
-            6: {
-                greek: "Ἄργος, ἐνίπλειος κυνοραιστέων.
-δὴ τότε γ᾽, ὡς ἐνόησεν Ὀδυσσέα ἐγγὺς ἐόντα,
-οὐρῇ μέν ῥ᾽ ὅ γ᾽ ἔσηνε καὶ οὔατα κάββαλεν ἄμφω.",
-                translation: "Allí estaba tendido el can Argos, infestado de pulgas. Justo en ese momento, al sentir a Odiseo cercano, saludando la cola movió y agachó las orejas."
-            }
-        };
+    function updateBookmark() {
+      const customGreek = document.getElementById("customGreek").value.trim();
+      const customTranslation = document.getElementById("customTranslation").value.trim();
+      const bg = document.getElementById("bgSelect").value;
+      const preview = document.getElementById("preview");
+      preview.style.backgroundImage = `url('${bg}')`;
 
-        function updateQuote() {
-            const selected = document.getElementById('quoteSelect').value;
-            const custom = document.getElementById('customText').value.trim();
-            if (custom !== "") {
-                document.getElementById('greek').textContent = custom;
-                document.getElementById('translation').textContent = "";
-            } else if (selected && quotes[selected]) {
-                document.getElementById('greek').textContent = quotes[selected].greek;
-                document.getElementById('translation').textContent = quotes[selected].translation;
-            } else {
-                document.getElementById('greek').textContent = "";
-                document.getElementById('translation').textContent = "";
-            }
-        }
+      if (customGreek) {
+        document.getElementById("greek").textContent = customGreek;
+        document.getElementById("translation").textContent = customTranslation;
+        document.getElementById("author").textContent = "Autor desconocido";
+      } else {
+        const i = document.getElementById("quoteSelect").value;
+        const p = phrases[i];
+        document.getElementById("greek").textContent = p.greek;
+        document.getElementById("translation").textContent = p.translation;
+        document.getElementById("author").textContent = p.author;
+      }
+    }
 
-        function updateBackground() {
-            const value = document.getElementById('backgroundSelect').value;
-            document.getElementById('bookmark').style.backgroundImage = "url('img/" + value + ".jpg')";
-        }
+    function downloadImage() {
+      html2canvas(document.getElementById("preview")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "marcapaginas.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
 
-        function downloadImage() {
-            html2canvas(document.getElementById("bookmark")).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'marcapaginas.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    window.onload = updateBookmark;
+  </script>
 </body>
 </html>
